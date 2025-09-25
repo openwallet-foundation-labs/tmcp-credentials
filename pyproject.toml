@@ -1,12 +1,11 @@
 [project]
-name = "mcp-server-demo"
+name = "tmcp-credentials"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
-    "mcp[ws]",
-]
+dependencies = ["mcp[ws]", "sd-jwt"]
 
 [tool.uv.sources]
+sd-jwt = { git = "https://github.com/openwallet-foundation-labs/sd-jwt-python" }
 mcp = { git = "https://github.com/openwallet-foundation-labs/mcp-over-tsp-python" }

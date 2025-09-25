@@ -3,6 +3,7 @@
 Run the server with:
 
 ```sh
+cd credential_checking_server
 uv run server.py
 ```
 
