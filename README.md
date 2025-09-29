@@ -1,14 +1,22 @@
 # tmcp-credentials
 
+Install the server alongside it's depednencies:
+```sh
+uv pip install -e .
+```
+
 Run the server with:
 
 ```sh
-cd credential_checking_server
-uv run server.py
+run-credential-checking-server
+```
+OR, Alternatively:
+```sh
+uv run -m src.credential_checking_server
 ```
 
 Then use a TMCP-enabled client to connect to it using the server's DID (see the [demo folder](https://github.com/openwallet-foundation-labs/mcp-over-tsp-python/tree/main/demo) in the TMCP repository for some TMCP-enabled clients). E.g. for fast-agent, use:
 
 ```sh
-uv run fast-agent go --url did:webvh:QmYsbUWtNNRkWM6nYLCfReYaaonD9Gfn8VzS4eneRpqM2L:did.teaspoon.world:endpoint:CredTmcpSseServer-0052270b-508a-4ab5-8091-3752fbb5ae82
+uv run fast-agent go --url <server-did-here>
 ```

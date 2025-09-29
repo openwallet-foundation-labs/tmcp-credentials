@@ -8,7 +8,7 @@ requires-python = ">=3.12"
 dependencies = ["mcp[ws]", "sd-jwt", "tmcp"]
 
 [project.scripts]
-credential-server = "credential_checking_server.__main__:main"
+run-credential-checking-server = "credential_checking_server.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
