@@ -1,12 +1,19 @@
 [project]
-name = "mcp-server-demo"
+name = "tmcp-credentials"
 version = "0.1.0"
-description = "Add your description here"
+authors = [{ name = "Ayush", email = "mail@ayuch.dev" }]
+description = "TMCP Servers to issue and verify credentials"
 readme = "README.md"
-requires-python = ">=3.11"
-dependencies = [
-    "mcp[ws]",
-]
+requires-python = ">=3.12"
+dependencies = ["mcp[ws]", "sd-jwt", "tmcp"]
+
+[project.scripts]
+run-credential-checking-server = "credential_checking_server.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.uv.sources]
-mcp = { git = "https://github.com/openwallet-foundation-labs/mcp-over-tsp-python" }
+sd-jwt = { git = "https://github.com/openwallet-foundation-labs/sd-jwt-python" }
+mcp = { git = "https://github.com/openwallet-foundation-labs/mcp-transport-hooks" }
+tmcp = { git = "https://github.com/openwallet-foundation-labs/tmcp-python" }
