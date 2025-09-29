@@ -3,7 +3,7 @@ from tmcp import TmcpManager
 
 # Create an MCP server
 mcp = FastMCP(
-    "Demo",
+    name="tmcp-credential-checking-server",
     port=8001,
     transport_manager=TmcpManager(transport="http://localhost:8001/mcp"),
 )
