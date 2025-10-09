@@ -23,13 +23,25 @@ class SdJwtHandler(BaseCredentialHandler):
     def create_presentation(
         self, credential, disclosed_claims, holder_key=None, options=None
     ):
+        options = options or {}
+        nonce = options.get("nonce")
+        aud = options.get("aud")
+
         holder = SDJWTHolder(credential)
-        holder.create_presentation(disclosed_claims, None, None, holder_key)
+        holder.create_presentation(disclosed_claims, nonce, aud, holder_key)
         return holder.sd_jwt_presentation
 
     def verify_presentation(self, presentation, get_issuer_key_callback, options=None):
-        verifier = SDJWTVerifier(presentation, get_issuer_key_callback, None, None)
-        return verifier.get_verified_payload()
+        options = options or {}
+        nonce = options.get("nonce")
+        aud = options.get("aud")
+
+        verifier = SDJWTVerifier(presentation, get_issuer_key_callback, aud, nonce)
+        verified_payload = verifier.get_verified_payload()
+
+        # TODO: implement binding and checking 'aud'
+
+        return verified_payload
 
     def generate_keys(self):
         issuer_key = JWK.generate(kty="EC", crv="P-256")
