@@ -20,3 +20,36 @@ Then use a TMCP-enabled client to connect to it using the server's DID (see the 
 ```sh
 uv run fast-agent go --url <server-did-here>
 ```
+
+### TMCP Server Testing
+
+1. Start the TMCP server, Copy the server DID from the output, e.g. `did:webvh:QmQLrF...`
+
+```sh
+uv run -m src.credential_checking_server
+```
+
+2. Run the `examples/generate_test_credential.py` file
+
+```sh
+uv run examples/generate_test_credential.py <server_did>
+```
+
+This creates:
+- `issuer_public_key.json` - Public key for the server to verify credentials
+- `test_presentation.txt` - A test presentation with the submission command
+
+3. Restart the TMCP server (close the previous session), and connect with fast-agent client.
+
+4. In fast-agent, copy and paste the full command from `test_presentation.txt`
+   
+**Expected Result:**
+```json
+{
+  "status": "success",
+  "message": "Credential verified.",
+  "claims": {
+    "cnf": {
+  ...
+}
+```
