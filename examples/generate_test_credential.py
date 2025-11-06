@@ -1,6 +1,6 @@
 """
 Generate a test SD-JWT credential for TMCP server testing.
-Usage: uv run examples/generate_test_credential.py <server_did>
+Usage: uv run examples/generate_test_credential.py <server_did> <issuer_did>
 """
 
 import json
@@ -13,8 +13,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from credential_handler import CredentialHandler, SdJwtHandler
 
 
-def generate_credential(server_did: str):
-    """Generate a test credential bound to the server DID"""
+def generate_credential(server_did: str, issuer_did: str):
+    """Generate a test credential bound to the server DID with verifiable issuer."""
     handler = CredentialHandler()
     sd_jwt_handler = SdJwtHandler()
     handler.register_handler(sd_jwt_handler)
@@ -25,14 +25,19 @@ def generate_credential(server_did: str):
     holder_key = keys["holder_key"]
     issuer_public_key = keys["issuer_public_key"]
 
-    # Save issuer public key for server verification
+    # Save issuer public key mapped to their DID
+    issuer_registry = {
+        "issuer_did": issuer_did,
+        "public_key": json.loads(issuer_public_key.export()),
+    }
+
     with open("issuer_public_key.json", "w") as f:
-        f.write(issuer_public_key.export())
+        json.dump(issuer_registry, f, indent=2)
     print("Saved issuer public key to issuer_public_key.json")
 
     # Create claims with holder binding
     user_claims = {
-        "iss": "https://issuer.example.com",
+        "iss": issuer_did,
         "sub": "user123",
         "given_name": "John",
         "family_name": "Doe",
@@ -64,6 +69,8 @@ def generate_credential(server_did: str):
 
     # Save to file for easy testing
     with open("test_presentation.txt", "w") as f:
+        f.write(f"# Issuer DID: {issuer_did}\n")
+        f.write(f"# Server DID: {server_did}\n\n")
         f.write(
             f'submit_credential format="sd-jwt" presentation="{presentation}" nonce="{nonce}"\n'
         )
@@ -77,13 +84,16 @@ def generate_credential(server_did: str):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: uv run examples/generate_test_credential.py <server_did>")
+    if len(sys.argv) < 3:
+        print(
+            "Usage: uv run examples/generate_test_credential.py <server_did> <issuer_did>"
+        )
         print("\nExample:")
         print(
-            "  uv run examples/generate_test_credential.py "
-            "did:webvh:QmXXX:did.teaspoon.world:endpoint:tmcp-xxx"
+            "  uv run examples/generate_test_credential.py \\\n"
+            "    did:webvh:QmXXX:did.teaspoon.world:endpoint:tmcp-xxx \\\n"
+            "    did:webvh:QmYYY:issuer.example.com"
         )
         sys.exit(1)
 
-    generate_credential(sys.argv[1])
+    generate_credential(sys.argv[1], sys.argv[2])

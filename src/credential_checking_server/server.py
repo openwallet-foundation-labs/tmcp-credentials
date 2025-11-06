@@ -1,3 +1,4 @@
+import json
 from mcp.server.fastmcp import FastMCP, Context
 from tmcp import TmcpManager
 from ..credential_handler import CredentialHandler, SdJwtHandler
@@ -10,12 +11,12 @@ handler.register_handler(sd_jwt_handler)
 
 try:
     with open("issuer_public_key.json", "r") as f:
-        ISSUER_PUBLIC_KEY = JWK.from_json(f.read())
+        ISSUER_REGISTRY = json.load(f)
     print("Verifying Server loaded Issuer's public key.")
 except FileNotFoundError:
     print(
         "Error: issuer_public_key.json not found. "
-        "Run tools/generate_test_credential.py first."
+        "Run examples/generate_test_credential.py first."
     )
     exit(1)
 
@@ -27,6 +28,27 @@ mcp = FastMCP(
     port=8001,
     transport_manager=tmcp_manager,
 )
+
+
+def resolve_issuer_public_key(issuer_did: str) -> JWK:
+    # Check if this issuer is in the trusted registry
+    if issuer_did != ISSUER_REGISTRY["issuer_did"]:
+        raise ValueError(
+            f"Issuer '{issuer_did}' is not trusted. "
+            f"Expected: {ISSUER_REGISTRY['issuer_did']}"
+        )
+
+    issuer_key = JWK(**ISSUER_REGISTRY["public_key"])
+    return issuer_key
+
+
+@mcp.tool()
+def get_server_did() -> dict:
+    """Returns the server's DID for credential binding."""
+    return {
+        "server_did": tmcp_manager.did,
+        "usage": "Use this DID as the 'aud' claim when generating credentials",
+    }
 
 
 @mcp.tool()
@@ -44,8 +66,8 @@ async def submit_credential(
     """Submits a credential presentation for verification."""
     try:
 
-        def get_issuer_public_key(issuer, header_parameters):
-            return ISSUER_PUBLIC_KEY
+        def get_issuer_public_key(issuer_did, header_parameters):
+            return resolve_issuer_public_key(issuer_did)
 
         # Verify the presentation
         verified_claims = handler.verify(
