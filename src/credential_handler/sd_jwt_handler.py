@@ -2,7 +2,6 @@ from .base_handler import BaseCredentialHandler
 from sd_jwt.issuer import SDJWTIssuer
 from sd_jwt.holder import SDJWTHolder
 from sd_jwt.verifier import SDJWTVerifier
-from sd_jwt.common import SDObj
 from jwcrypto.jwk import JWK
 
 
@@ -17,8 +16,7 @@ class SdJwtHandler(BaseCredentialHandler):
         return "sd-jwt"
 
     def issue_credential(self, user_claims, issuer_key, holder_key=None):
-        sd_user_claims = {SDObj(key): value for key, value in user_claims.items()}
-        issuer = SDJWTIssuer(sd_user_claims, issuer_key, holder_key)
+        issuer = SDJWTIssuer(user_claims, issuer_key, holder_key)
         return issuer.sd_jwt_issuance
 
     def create_presentation(
